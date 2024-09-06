@@ -22,6 +22,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+import com.google.auth.http.HttpCredentialsAdapter
+
+
 fun getCredentials(context: Context, jsonKeyPath: String): GoogleCredentials {
     val inputStream = context.assets.open(jsonKeyPath)
     return GoogleCredentials.fromStream(inputStream)
@@ -53,7 +56,10 @@ class MainActivity : ComponentActivity() {
         val httpTransport = NetHttpTransport()
         val jsonFactory = JacksonFactory.getDefaultInstance()
 
-        val service = Sheets.Builder(httpTransport, jsonFactory, getCredentials(this, "jupiter_credentials.json"))
+        val credentials = getCredentials(this, "jupiter_credentials.json")
+        val requestInitializer = HttpCredentialsAdapter(credentials)
+
+        val service = Sheets.Builder(httpTransport, jsonFactory, requestInitializer)
             .setApplicationName("Jupiter App")
             .build()
 
