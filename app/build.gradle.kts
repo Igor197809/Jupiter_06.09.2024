@@ -66,4 +66,11 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    implementation("com.google.api-client:google-api-client-android:1.33.0")
+    implementation("com.google.oauth-client:google-oauth-client-jetty:1.33.0")
+    implementation("com.google.apis:google-api-services-sheets:v4-rev581-1.25.0")
+
+
+
 }
