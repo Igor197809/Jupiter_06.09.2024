@@ -86,6 +86,12 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-core:2.13.0")
 
 
+    implementation("com.google.auth:google-auth-library-oauth2-http:0.25.2")
+    implementation("com.google.api-client:google-api-client-android:1.33.0")
+    implementation("com.google.apis:google-api-services-sheets:v4-rev581-1.25.0")
+
+
+
     // Testing dependencies
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

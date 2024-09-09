@@ -1,14 +1,21 @@
+package com.example.jupiter_06092024
+
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.api.client.extensions.android.http.AndroidHttp
+
 import com.google.api.client.googleapis.json.GoogleJsonResponseException
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.sheets.v4.Sheets
+import com.google.api.services.sheets.v4.SheetsScopes
+import com.google.auth.http.HttpCredentialsAdapter
+import com.google.auth.oauth2.GoogleCredentials
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.io.InputStream
 
 class MainViewModel(private val context: Context) : ViewModel() {
 
@@ -17,21 +24,21 @@ class MainViewModel(private val context: Context) : ViewModel() {
     private val TAG = "MainViewModel"
 
     init {
-        Log.d(TAG, "ViewModel инициализирован")
+        Log.d(TAG, "ViewModel initialized")
         loadData()
     }
 
     private fun loadData() {
         viewModelScope.launch {
             try {
-                Log.d(TAG, "Начало загрузки данных")
+                Log.d(TAG, "Loading data from Google Sheets")
                 val data = accessGoogleSheet()
                 _sheetData.value = data
-                Log.d(TAG, "Данные успешно загружены: $data")
+                Log.d(TAG, "Data successfully loaded: $data")
             } catch (e: GoogleJsonResponseException) {
-                Log.e(TAG, "Ошибка при загрузке данных: ${e.statusCode} - ${e.message}", e)
+                Log.e(TAG, "Error loading data: ${e.statusCode} - ${e.message}", e)
             } catch (e: Exception) {
-                Log.e(TAG, "Ошибка при загрузке данных: ${e.message}", e)
+                Log.e(TAG, "Error loading data: ${e.message}", e)
             }
         }
     }
@@ -40,22 +47,25 @@ class MainViewModel(private val context: Context) : ViewModel() {
         val httpTransport = AndroidHttp.newCompatibleTransport()
         val jsonFactory = JacksonFactory.getDefaultInstance()
 
-        Log.d(TAG, "Запрос данных с Google Sheets")
-        val credentials = getCredentials() // Функция для получения учетных данных OAuth
-        val sheetsService = Sheets.Builder(httpTransport, jsonFactory, credentials)
+        // Replace with your credentials retrieval logic
+        val credentials = getCredentials(context, "jupiter_credentials.json")
+        val requestInitializer = HttpCredentialsAdapter(credentials)
+
+        val service = Sheets.Builder(httpTransport, jsonFactory, requestInitializer)
             .setApplicationName("Jupiter App")
             .build()
 
-        val spreadsheetId = "ваш_spreadsheetId"
+        val spreadsheetId = "1J5wxqk1_nCPEUBnilSHI8RgnWU7CUV-vxrAVGl6LX5M"
         val range = "Sheet1!A1:D5"
 
-        val response = sheetsService.spreadsheets().values().get(spreadsheetId, range).execute()
-        Log.d(TAG, "Ответ от Google Sheets: $response")
-
+        val response = service.spreadsheets().values().get(spreadsheetId, range).execute()
         return response.getValues() ?: emptyList()
     }
 
-    private fun getCredentials(): Sheets {
-        // Здесь ваш код для получения учетных данных OAuth
+    private fun getCredentials(context: Context, credentialsFileName: String): GoogleCredentials {
+        // Load credentials from the assets folder or resources
+        val inputStream: InputStream = context.assets.open(credentialsFileName)
+        return GoogleCredentials.fromStream(inputStream)
+            .createScoped(listOf(SheetsScopes.SPREADSHEETS_READONLY))
     }
 }
