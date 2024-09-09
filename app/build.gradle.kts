@@ -103,5 +103,12 @@ dependencies {
     implementation ("com.fasterxml.jackson.core:jackson-core:2.13.0")
     implementation ("com.google.apis:google-api-services-sheets:v4-rev614-1.25.0")
 
+    implementation ("com.fasterxml.jackson.core:jackson-core:2.12.3")
+    implementation ("com.fasterxml.jackson.core:jackson-databind:2.12.3")
+    implementation ("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.3")
+
+    implementation ("com.google.apis:google-api-services-sheets:v4-rev614-1.25.0")
+    implementation ("com.google.auth:google-auth-library-oauth2-http:0.25.2")
+
 
 }
