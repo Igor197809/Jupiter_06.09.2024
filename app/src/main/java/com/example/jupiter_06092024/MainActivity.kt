@@ -1,30 +1,25 @@
 package com.example.jupiter_06092024
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.ui.Modifier
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.composable
+import com.example.jupiter_06092024.ui.TableScreen
+import com.example.jupiter_06092024.ui.WelcomeScreen
 import com.example.jupiter_06092024.ui.theme.Jupiter_06092024Theme
 
-import com.example.jupiter_06092024.ui.WelcomeScreen
-import com.example.jupiter_06092024.ui.TableScreen
-
-import com.example.jupiter_06092024.ui.WelcomeScreen
-import com.example.jupiter_06092024.ui.TableScreen
-
-import androidx.lifecycle.viewmodel.compose.viewModel
-
-
-
-
 class MainActivity : ComponentActivity() {
+    private val viewModel: MainViewModel by viewModels {
+        MainViewModelFactory(applicationContext)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -38,11 +33,20 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     composable(route = "table") {
-                        val viewModel: MainViewModel = viewModel()
                         TableScreen(data = viewModel.sheetData.value)
                     }
                 }
             }
         }
+    }
+}
+
+class MainViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return MainViewModel(context) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

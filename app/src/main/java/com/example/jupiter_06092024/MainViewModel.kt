@@ -22,32 +22,30 @@ class MainViewModel(private val context: Context) : ViewModel() {
     private val TAG = "MainViewModel"
 
     init {
-        Log.d(TAG, "ViewModel инициализирован")
+        Log.d(TAG, "ViewModel initialized")
         loadData()
     }
 
     private fun loadData() {
-        Log.d(TAG, "loadData: Старт загрузки данных")
         viewModelScope.launch {
             try {
-                Log.d(TAG, "loadData: Вызов метода доступа к Google Sheets")
+                Log.d(TAG, "Loading data from Google Sheets")
                 val data = accessGoogleSheet()
                 _sheetData.value = data
-                Log.d(TAG, "loadData: Данные успешно загружены: $data")
+                Log.d(TAG, "Data successfully loaded: $data")
             } catch (e: GoogleJsonResponseException) {
-                Log.e(TAG, "loadData: Ошибка Google Sheets API: ${e.statusCode} - ${e.message}", e)
+                Log.e(TAG, "Error loading data: ${e.statusCode} - ${e.message}", e)
             } catch (e: Exception) {
-                Log.e(TAG, "loadData: Неизвестная ошибка при загрузке данных: ${e.message}", e)
+                Log.e(TAG, "Error loading data: ${e.message}", e)
             }
         }
     }
 
     private suspend fun accessGoogleSheet(): List<List<Any>> {
-        Log.d(TAG, "Начало вызова Google Sheets API")
+        Log.d(TAG, "Starting Google Sheets API call")
         val httpTransport = NetHttpTransport()
         val jsonFactory = JacksonFactory.getDefaultInstance()
 
-        Log.d(TAG, "Получение учетных данных")
         val credentials = getCredentials(context, "jupiter_credentials.json")
         val requestInitializer = HttpCredentialsAdapter(credentials)
 
@@ -58,20 +56,15 @@ class MainViewModel(private val context: Context) : ViewModel() {
         val spreadsheetId = "1J5wxqk1_nCPEUBnilSHI8RgnWU7CUV-vxrAVGl6LX5M"
         val range = "Sheet1!A1:D5"
 
-        Log.d(TAG, "Отправка запроса к Google Sheets для ID: $spreadsheetId и диапазона: $range")
-        try {
-            val response = service.spreadsheets().values().get(spreadsheetId, range).execute()
-            Log.d(TAG, "Ответ от Google Sheets: ${response.values}")
-            return response.getValues() ?: emptyList()
-        } catch (e: Exception) {
-            Log.e(TAG, "Ошибка при вызове Google Sheets API: ${e.message}")
-            return emptyList()
-        }
+        Log.d(TAG, "Sending request to Google Sheets")
+        val response = service.spreadsheets().values().get(spreadsheetId, range).execute()
+        Log.d(TAG, "Response received from Google Sheets: ${response.values}")
+
+        return response.getValues() ?: emptyList()
     }
 
-
     private fun getCredentials(context: Context, credentialsFileName: String): GoogleCredentials {
-        Log.d(TAG, "getCredentials: Загрузка учетных данных из файла $credentialsFileName")
+        Log.d(TAG, "Fetching credentials")
         val inputStream: InputStream = context.assets.open(credentialsFileName)
         return GoogleCredentials.fromStream(inputStream)
             .createScoped(listOf("https://www.googleapis.com/auth/spreadsheets"))
