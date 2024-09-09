@@ -67,6 +67,6 @@ class MainViewModel(private val context: Context) : ViewModel() {
     private fun getCredentials(context: Context, credentialsFileName: String): GoogleCredentials {
         val inputStream: InputStream = context.assets.open(credentialsFileName)
         return GoogleCredentials.fromStream(inputStream)
-            .createScoped(listOf("https://www.googleapis.com/auth/spreadsheets.readonly"))
+            .createScoped(listOf("https://www.googleapis.com/auth/spreadsheets"))
     }
 }
