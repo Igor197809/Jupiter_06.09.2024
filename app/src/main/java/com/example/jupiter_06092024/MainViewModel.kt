@@ -42,10 +42,10 @@ class MainViewModel(private val context: Context) : ViewModel() {
     }
 
     private suspend fun accessGoogleSheet(): List<List<Any>> {
+        Log.d(TAG, "Начало вызова Google Sheets API")
         val httpTransport = NetHttpTransport()
         val jsonFactory = JacksonFactory.getDefaultInstance()
 
-        // Replace with your credentials retrieval logic
         val credentials = getCredentials(context, "jupiter_credentials.json")
         val requestInitializer = HttpCredentialsAdapter(credentials)
 
@@ -56,9 +56,13 @@ class MainViewModel(private val context: Context) : ViewModel() {
         val spreadsheetId = "1J5wxqk1_nCPEUBnilSHI8RgnWU7CUV-vxrAVGl6LX5M"
         val range = "Sheet1!A1:D5"
 
+        Log.d(TAG, "Запрос в Google Sheets")
         val response = service.spreadsheets().values().get(spreadsheetId, range).execute()
+        Log.d(TAG, "Ответ от Google Sheets получен")
+
         return response.getValues() ?: emptyList()
     }
+
 
     private fun getCredentials(context: Context, credentialsFileName: String): GoogleCredentials {
         val inputStream: InputStream = context.assets.open(credentialsFileName)
