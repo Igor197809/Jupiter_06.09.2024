@@ -4,18 +4,16 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.api.client.extensions.android.http.AndroidHttp
-
 import com.google.api.client.googleapis.json.GoogleJsonResponseException
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.sheets.v4.Sheets
-import com.google.api.services.sheets.v4.SheetsScopes
 import com.google.auth.http.HttpCredentialsAdapter
 import com.google.auth.oauth2.GoogleCredentials
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.io.InputStream
+import com.google.api.client.http.javanet.NetHttpTransport
 
 class MainViewModel(private val context: Context) : ViewModel() {
 
@@ -44,7 +42,7 @@ class MainViewModel(private val context: Context) : ViewModel() {
     }
 
     private suspend fun accessGoogleSheet(): List<List<Any>> {
-        val httpTransport = AndroidHttp.newCompatibleTransport()
+        val httpTransport = NetHttpTransport()
         val jsonFactory = JacksonFactory.getDefaultInstance()
 
         // Replace with your credentials retrieval logic
@@ -63,9 +61,8 @@ class MainViewModel(private val context: Context) : ViewModel() {
     }
 
     private fun getCredentials(context: Context, credentialsFileName: String): GoogleCredentials {
-        // Load credentials from the assets folder or resources
         val inputStream: InputStream = context.assets.open(credentialsFileName)
         return GoogleCredentials.fromStream(inputStream)
-            .createScoped(listOf(SheetsScopes.SPREADSHEETS_READONLY))
+            .createScoped(listOf("https://www.googleapis.com/auth/spreadsheets.readonly"))
     }
 }
