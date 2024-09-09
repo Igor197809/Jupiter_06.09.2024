@@ -5,7 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,6 +17,8 @@ import com.example.jupiter_06092024.R
 @Composable
 fun WelcomeScreen(onContinue: () -> Unit, loadingPercentage: Float) {
     Log.d("WelcomeScreen", "WelcomeScreen запущен с процентом загрузки: $loadingPercentage")
+
+    var hasNavigated by remember { mutableStateOf(false) } // Флаг для предотвращения многократной навигации
 
     Box(
         modifier = Modifier
@@ -45,8 +47,10 @@ fun WelcomeScreen(onContinue: () -> Unit, loadingPercentage: Float) {
         }
     }
 
-    if (loadingPercentage >= 1.0f) {
+    // Когда процент загрузки достиг 100%, остановите загрузку и выполните переход
+    if (loadingPercentage >= 1.0f && !hasNavigated) {
         Log.d("WelcomeScreen", "Загрузка завершена, выполнение onContinue()")
+        hasNavigated = true // Переход выполнен, повторный вызов запрещён
         onContinue()
     } else {
         Log.d("WelcomeScreen", "Загрузка продолжается")

@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
@@ -23,19 +24,24 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d("MainActivity", "Activity Created")
+        Log.d("MainActivity", "ViewModel instance: $viewModel")
+
         setContent {
             Jupiter_06092024Theme {
                 val navController = rememberNavController()
                 NavHost(navController = navController, startDestination = "welcome") {
                     composable(route = "welcome") {
+                        val loadingPercentage = viewModel.loadingProgress.observeAsState(0f)
                         WelcomeScreen(
                             onContinue = { navController.navigate(route = "table") },
-                            loadingPercentage = 0.8f // замените на динамическое значение
+                            loadingPercentage = loadingPercentage.value // динамическое значение
                         )
                     }
                     composable(route = "table") {
                         Log.d("MainActivity", "Navigating to TableScreen")
-                        TableScreen(data = viewModel.sheetData.value)
+                        viewModel.sheetData.value?.let { data ->
+                            TableScreen(data = data)
+                        } ?: Log.e("MainActivity", "Data is null")
                     }
                 }
             }
@@ -45,7 +51,7 @@ class MainActivity : ComponentActivity() {
 
 class MainViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        Log.d("MainViewModelFactory", "Creating MainViewModel") // Лог для отладки
+        Log.d("MainViewModelFactory", "Factory is creating MainViewModel")
         if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
             return MainViewModel(context) as T
