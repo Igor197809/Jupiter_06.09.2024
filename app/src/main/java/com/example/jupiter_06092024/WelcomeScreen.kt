@@ -1,5 +1,6 @@
 package com.example.jupiter_06092024.ui
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -15,6 +16,8 @@ import com.example.jupiter_06092024.R
 
 @Composable
 fun WelcomeScreen(onContinue: () -> Unit, loadingPercentage: Float) {
+    Log.d("WelcomeScreen", "WelcomeScreen запущен с процентом загрузки: $loadingPercentage")
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -32,10 +35,21 @@ fun WelcomeScreen(onContinue: () -> Unit, loadingPercentage: Float) {
                     .fillMaxWidth(0.8f)
                     .padding(bottom = 16.dp)
             )
+            Log.d("WelcomeScreen", "Логотип отображен")
+
             Text(text = "Загрузка данных...", color = Color.White)
             Spacer(modifier = Modifier.height(16.dp))
+
             Text(text = "Загрузка на ${loadingPercentage * 100}%", color = Color.White)
+            Log.d("WelcomeScreen", "Статус загрузки обновлен: ${loadingPercentage * 100}%")
         }
+    }
+
+    if (loadingPercentage >= 1.0f) {
+        Log.d("WelcomeScreen", "Загрузка завершена, выполнение onContinue()")
+        onContinue()
+    } else {
+        Log.d("WelcomeScreen", "Загрузка продолжается")
     }
 }
 
