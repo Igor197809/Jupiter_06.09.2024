@@ -9,12 +9,8 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun TableScreen(data: List<List<Any>>) {
     Column(modifier = Modifier.padding(16.dp)) {
-        if (data.isNotEmpty()) {
-            data.take(5).forEach { row ->
-                Text(text = row.joinToString(", "))
-            }
-        } else {
-            Text(text = "Данные не найдены.")
+        data.take(5).forEach { row ->
+            Text(text = row.joinToString(", "), modifier = Modifier.padding(8.dp))
         }
     }
 }
