@@ -86,7 +86,22 @@ dependencies {
     implementation("androidx.compose.material3:material3:1.0.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
 
+    implementation("androidx.compose.ui:ui:1.0.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")
+    implementation("com.google.api-client:google-api-client:1.31.2")
+    implementation("com.google.apis:google-api-services-sheets:v4-rev612-1.25.0")
+    implementation("com.google.auth:google-auth-library-oauth2-http:0.22.0")
 
+    implementation ("com.google.api-client:google-api-client:1.31.5")
+    implementation ("com.google.oauth-client:google-oauth-client-jetty:1.31.5")
+    implementation ("com.google.apis:google-api-services-sheets:v4-rev614-1.25.0")
+    implementation ("com.fasterxml.jackson.core:jackson-databind:2.13.0")
+    implementation ("com.fasterxml.jackson.core:jackson-core:2.13.0")
+    implementation ("com.fasterxml.jackson.core:jackson-annotations:2.13.0")
+
+    implementation ("com.fasterxml.jackson.core:jackson-databind:2.13.0")
+    implementation ("com.fasterxml.jackson.core:jackson-core:2.13.0")
+    implementation ("com.google.apis:google-api-services-sheets:v4-rev614-1.25.0")
 
 
 }
