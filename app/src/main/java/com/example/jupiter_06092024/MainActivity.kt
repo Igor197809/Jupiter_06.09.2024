@@ -3,16 +3,15 @@ package com.example.jupiter_06092024
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.jupiter_06092024.ui.theme.Jupiter_06092024Theme
-import kotlinx.coroutines.launch
-
 import com.example.jupiter_06092024.ui.WelcomeScreen
-
+import com.example.jupiter_06092024.ui.TableScreen
+import com.example.jupiter_06092024.MainViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,12 +26,16 @@ class MainActivity : ComponentActivity() {
 fun JupiterApp() {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "welcome") {
-        composable("welcome") {
-            WelcomeScreen(onContinue = { navController.navigate("table") })
+        composable(route = "welcome") {
+            WelcomeScreen(
+                onContinue = { navController.navigate(route = "table") },
+                loadingPercentage = 0.8f // Замените на динамическое значение
+            )
         }
-        composable("table") {
+        composable(route = "table") {
             val viewModel: MainViewModel = viewModel()
-            TableScreen(data = viewModel.sheetData)
+            TableScreen(data = viewModel.sheetData.value)
+
         }
     }
 }
