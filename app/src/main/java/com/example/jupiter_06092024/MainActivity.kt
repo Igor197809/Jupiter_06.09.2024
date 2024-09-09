@@ -45,6 +45,7 @@ class MainActivity : ComponentActivity() {
 
 class MainViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        Log.d("MainViewModelFactory", "Creating MainViewModel") // Лог для отладки
         if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
             return MainViewModel(context) as T
