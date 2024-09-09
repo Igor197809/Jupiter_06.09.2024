@@ -9,40 +9,44 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.background
+
+
 
 @Composable
 fun WelcomeScreen(onContinue: () -> Unit, loadingPercentage: Float) {
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+            .background(Color.Black),  // Установка черного фона
+        contentAlignment = Alignment.Center
     ) {
-        // Логотип
-        Image(
-            painter = painterResource(id = R.drawable.logo_start),
-            contentDescription = "Логотип",
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp),
-            contentScale = ContentScale.Fit
-        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.logo_start),
+                contentDescription = "Логотип",
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .padding(bottom = 16.dp)
+            )
 
-        Spacer(modifier = Modifier.height(32.dp))
+            Text(text = "Загрузка данных...", color = Color.White)
 
-        // Статус-бар с прогрессом
-        LinearProgressIndicator(
-            progress = loadingPercentage,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        )
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
+            LinearProgressIndicator(
+                progress = loadingPercentage,
+                modifier = Modifier.fillMaxWidth(0.8f)
+            )
 
-        Button(onClick = onContinue) {
-            Text("Продолжить")
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Button(onClick = onContinue) {
+                Text(text = "Продолжить")
+            }
         }
     }
 }
