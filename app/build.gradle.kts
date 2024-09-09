@@ -74,6 +74,9 @@ dependencies {
     implementation("com.google.oauth-client:google-oauth-client-jetty:1.33.2")
     implementation("com.google.apis:google-api-services-sheets:v4-rev581-1.25.0")
 
+    // Важная зависимость для работы с HTTP на Android
+    implementation("com.google.http-client:google-http-client-android:1.39.2")
+
     implementation("com.google.auth:google-auth-library-oauth2-http:0.25.2")
 
     // Testing dependencies
