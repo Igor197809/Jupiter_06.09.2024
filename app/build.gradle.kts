@@ -68,12 +68,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
 
     // Google Sheets API and OAuth dependencies
-    implementation("com.google.api-client:google-api-client-android:1.33.0")
-    implementation("com.google.oauth-client:google-oauth-client-jetty:1.33.0")
-
-    implementation("com.google.apis:google-api-services-sheets:v4-rev581-1.25.0")
-
-
+    implementation("com.google.api-client:google-api-client-android:1.33.2") // Обновленная версия
+    implementation("com.google.oauth-client:google-oauth-client-jetty:1.33.2")
+    implementation("com.google.apis:google-api-services-sheets:v4-rev581-1.25.0") // Верная версия
 
     implementation("com.google.auth:google-auth-library-oauth2-http:0.25.2")
 
@@ -81,6 +78,13 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.12.3")
     implementation("com.fasterxml.jackson.core:jackson-core:2.12.3")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.3")
+
+
+    implementation("com.google.api-client:google-api-client-android:1.33.0")
+    implementation("com.google.auth:google-auth-library-oauth2-http:1.11.0")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.13.0")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.13.0")
+
 
     // Testing dependencies
     testImplementation(libs.junit)
