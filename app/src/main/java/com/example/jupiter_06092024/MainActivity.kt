@@ -2,10 +2,10 @@ package com.example.jupiter_06092024
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
@@ -22,6 +22,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d("MainActivity", "Activity Created")
         setContent {
             Jupiter_06092024Theme {
                 val navController = rememberNavController()
@@ -33,6 +34,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     composable(route = "table") {
+                        Log.d("MainActivity", "Navigating to TableScreen")
                         TableScreen(data = viewModel.sheetData.value)
                     }
                 }
