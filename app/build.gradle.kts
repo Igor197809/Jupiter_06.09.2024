@@ -74,7 +74,8 @@ dependencies {
 
     // Google HTTP Client для Android и Jackson
     implementation("com.google.http-client:google-http-client-android:1.41.5")
-    implementation("com.google.api-client:google-api-client-jackson2:2.7.0")
+    implementation("com.google.api-client:google-api-client-jackson2:1.30.10")
+
 
 
     // Google OAuth2 HTTP
