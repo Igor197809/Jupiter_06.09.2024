@@ -83,7 +83,7 @@ dependencies {
     // Для использования LiveData в Jetpack Compose
     implementation("androidx.compose.runtime:runtime-livedata:1.1.0")
 
-    // Google OAuth2 HTTP
+    // Google OAuth2 HTTP (HttpCredentialsAdapter)
     implementation("com.google.auth:google-auth-library-oauth2-http:0.25.2")
 
     // Testing
