@@ -1,80 +1,56 @@
 package com.example.jupiter_06092024
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.google.auth.oauth2.GoogleCredentials
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
-import com.google.api.client.json.jackson2.JacksonFactory
-import com.google.api.services.sheets.v4.Sheets
-import kotlinx.coroutines.*
-import java.io.InputStream
-import com.google.api.client.http.HttpRequestInitializer
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 
-class MainViewModel(application: Application) : AndroidViewModel(application) {
+class MainViewModel(application: android.app.Application) : AndroidViewModel(application) {
 
-    private val _loadingProgress = MutableLiveData<Float>()
+    private val _loadingProgress = MutableLiveData(0f)
     val loadingProgress: LiveData<Float> = _loadingProgress
 
-    private val _sheetData = MutableLiveData<Map<String, List<List<Any>>>>()
+    private val _sheetData = MutableLiveData<Map<String, List<List<Any>>>>() // Изменено на List<List<Any>>
     val sheetData: LiveData<Map<String, List<List<Any>>>> = _sheetData
 
-    private val spreadsheetId = "1J5wxqk1_nCPEUBnilSHI8RgnWU7CUV-vxrAVGl6LX5M"
-
     init {
-        viewModelScope.launch {
-            syncDatabase()
-        }
+        loadData()
     }
 
-    suspend fun syncDatabase() {
-        withContext(Dispatchers.IO) {
-            try {
-                val tabs = listOf("Sheet1!A1:D10", "Sheet2!A1:D10")
-                val credentialsStream: InputStream = getApplication<Application>().assets.open("jupiter_credentials.json")
-                val credential = GoogleCredentials.fromStream(credentialsStream)
-                    .createScoped(listOf("https://www.googleapis.com/auth/spreadsheets"))
+    private fun loadData() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val data = withTimeoutOrNull(5000) { // Таймаут на 5 секунд
+                // Симуляция загрузки данных
+                fetchDataFromGoogleSheets()
+            }
 
-                val sheetsService = Sheets.Builder(
-                    GoogleNetHttpTransport.newTrustedTransport(),
-                    JacksonFactory.getDefaultInstance(),
-                    credential as HttpRequestInitializer  // Исправляем тип на HttpRequestInitializer
-                ).setApplicationName("Jupiter App")
-                    .build()
-
-                val data = mutableMapOf<String, List<List<Any>>>()
-
-                withTimeoutOrNull(5000L) {
-                    tabs.forEachIndexed { index, tab ->
-                        val response = sheetsService.spreadsheets().values()
-                            .get(spreadsheetId, tab)
-                            .execute()
-                        val values = response.getValues()
-                        if (values != null) {
-                            data[tab] = values
-                            _loadingProgress.postValue((index + 1) / tabs.size.toFloat())
-                        }
-                    }
-                }
-
-                if (data.isNotEmpty()) {
-                    _sheetData.postValue(data)
-                    Log.d("MainViewModel", "Данные загружены успешно")
-                } else {
-                    Log.e("MainViewModel", "Не удалось загрузить данные за 5 секунд, используем локальные данные")
-                    loadFromLocalDatabase()
-                }
-            } catch (e: Exception) {
-                Log.e("MainViewModel", "Ошибка синхронизации: ${e.message}")
-                loadFromLocalDatabase()
+            if (data != null) {
+                _sheetData.postValue(data)
+                _loadingProgress.postValue(1f) // Загрузка завершена
+            } else {
+                // Загрузка кэшированных данных
+                val cachedData = loadCachedData()
+                _sheetData.postValue(cachedData)
             }
         }
     }
 
-    private fun loadFromLocalDatabase() {
-        Log.d("MainViewModel", "Загрузка данных из локальной базы")
+    private suspend fun fetchDataFromGoogleSheets(): Map<String, List<List<Any>>> {
+        // Здесь должна быть реализация загрузки данных с Google Sheets
+        return mapOf("Sheet1" to listOf(
+            listOf("Данные 1", "Данные 2", "Данные 3") as List<Any>,  // Пример данных
+            listOf("Данные 4", "Данные 5", "Данные 6") as List<Any>
+        ))
+    }
+
+    private fun loadCachedData(): Map<String, List<List<Any>>> {
+        // Логика загрузки кэшированных данных
+        return mapOf("Sheet1" to listOf(
+            listOf("Кэшированные данные 1", "Кэшированные данные 2") as List<Any>
+        ))
     }
 }

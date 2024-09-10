@@ -36,27 +36,21 @@ class MainActivity : ComponentActivity() {
                     composable("table") {
                         val data = viewModel.sheetData.observeAsState(emptyMap())
                         val sheetData = data.value["Sheet1"] // Получаем данные по ключу вкладки
-                        TableScreen(data = sheetData ?: emptyList()) // Передаем данные или пустой список
+
+                        // Преобразуем данные в ожидаемый формат, если это нужно для отображения
+                        TableScreen(data = sheetData ?: emptyList())
                     }
+
                 }
             }
         }
 
-        // Запуск WorkManager для фоновой синхронизации
-        scheduleBackgroundSync()
-    }
-
-    private fun scheduleBackgroundSync() {
-        val syncRequest = PeriodicWorkRequestBuilder<SyncWorker>(1, TimeUnit.HOURS)
-            .setConstraints(
-                Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.CONNECTED)
-                    .build()
-            )
+        // Запуск WorkManager для фоновой синхронизации каждые 15 минут
+        val syncRequest = PeriodicWorkRequestBuilder<SyncWorker>(15, TimeUnit.MINUTES)
             .build()
 
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-            "SyncWork",
+            "SyncWorker",
             ExistingPeriodicWorkPolicy.KEEP,
             syncRequest
         )

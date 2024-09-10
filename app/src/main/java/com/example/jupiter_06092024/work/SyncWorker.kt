@@ -1,28 +1,27 @@
 package com.example.jupiter_06092024.work
 
-import android.app.Application
 import android.content.Context
-import androidx.work.CoroutineWorker
+import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.example.jupiter_06092024.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
-class SyncWorker(appContext: Context, params: WorkerParameters) : CoroutineWorker(appContext, params), KoinComponent {
+class SyncWorker(appContext: Context, workerParams: WorkerParameters) : Worker(appContext, workerParams) {
 
-    private val viewModel: MainViewModel by inject()
+    override fun doWork(): Result {
+        return try {
+            // Фоновая синхронизация данных
+            syncDataWithGoogleSheets()
 
-    override suspend fun doWork(): Result {
-        return withContext(Dispatchers.IO) {
-            try {
-                // Запуск синхронизации базы данных
-                viewModel.syncDatabase()
-                Result.success()
-            } catch (e: Exception) {
-                Result.failure()
-            }
+            Result.success()
+        } catch (e: Exception) {
+            Result.failure()
         }
+    }
+
+    private fun syncDataWithGoogleSheets() {
+        // Логика фоновой синхронизации данных
+        // Вы можете использовать тот же механизм, что и в MainViewModel
     }
 }
