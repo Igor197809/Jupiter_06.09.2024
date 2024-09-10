@@ -6,66 +6,75 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.api.client.extensions.android.http.AndroidHttp
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential
+import com.google.auth.oauth2.GoogleCredentials
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.sheets.v4.Sheets
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.io.InputStream
+import com.google.auth.http.HttpCredentialsAdapter
 
-class MainViewModel(context: Context) : ViewModel() {
+class MainViewModel(private val context: Context) : ViewModel() {
 
     private val _loadingProgress = MutableLiveData<Float>()
     val loadingProgress: LiveData<Float> = _loadingProgress
 
-    private val _sheetData = MutableLiveData<List<List<Any>>>()
-    val sheetData: LiveData<List<List<Any>>> = _sheetData
+    private val _sheetData = MutableLiveData<Map<String, List<List<Any>>>>()
+    val sheetData: LiveData<Map<String, List<List<Any>>>> = _sheetData
 
     private val spreadsheetId = "1J5wxqk1_nCPEUBnilSHI8RgnWU7CUV-vxrAVGl6LX5M"
-    private val range = "Sheet1!A1:D10" // Диапазон данных, которые мы хотим загрузить
 
     init {
-        Log.e("MainViewModel", "Creating MainViewModel")
         viewModelScope.launch {
-            loadDataFromGoogleSheets(context)
+            syncDatabase()
         }
     }
 
-    private suspend fun loadDataFromGoogleSheets(context: Context) {
+    suspend fun syncDatabase() {
         withContext(Dispatchers.IO) {
-            Log.d("MainViewModel", "Loading data from Google Sheets")
+            try {
+                val tabs = listOf("Sheet1!A1:D10", "Sheet2!A1:D10")
+                val credentialsStream: InputStream = context.assets.open("jupiter_credentials.json")
+                val credential = GoogleCredentials.fromStream(credentialsStream)
+                    .createScoped(listOf("https://www.googleapis.com/auth/spreadsheets"))
 
-            // Чтение учетных данных из assets
-            val credentialsStream: InputStream = context.assets.open("jupiter_credentials.json")
-            val credential = GoogleCredential.fromStream(credentialsStream)
-                .createScoped(listOf("https://www.googleapis.com/auth/spreadsheets"))
+                val sheetsService = Sheets.Builder(
+                    GoogleNetHttpTransport.newTrustedTransport(),
+                    JacksonFactory.getDefaultInstance(),
+                    HttpCredentialsAdapter(credential)  // Преобразование в HttpRequestInitializer
+                ).setApplicationName("Jupiter App")
+                    .build()
 
-            // Инициализация Google Sheets API
-            val sheetsService = Sheets.Builder(
-                AndroidHttp.newCompatibleTransport(),
-                JacksonFactory.getDefaultInstance(),
-                credential
-            )
-                .setApplicationName("Jupiter App")
-                .build()
+                val data = mutableMapOf<String, List<List<Any>>>()
 
-            // Запрос к Google Sheets API
-            val response = sheetsService.spreadsheets().values()
-                .get(spreadsheetId, range)
-                .execute()
+                withTimeoutOrNull(5000L) {
+                    tabs.forEachIndexed { index, tab ->
+                        val response = sheetsService.spreadsheets().values()
+                            .get(spreadsheetId, tab)
+                            .execute()
+                        val values = response.getValues()
+                        if (values != null) {
+                            data[tab] = values
+                            _loadingProgress.postValue((index + 1) / tabs.size.toFloat())
+                        }
+                    }
+                }
 
-            val values = response.getValues()
-
-            if (values != null && values.isNotEmpty()) {
-                Log.d("MainViewModel", "Data retrieved successfully")
-                _sheetData.postValue(values)
-            } else {
-                Log.e("MainViewModel", "No data found")
+                if (data.isNotEmpty()) {
+                    _sheetData.postValue(data)
+                    Log.d("MainViewModel", "Данные загружены успешно")
+                } else {
+                    Log.e("MainViewModel", "Не удалось загрузить данные за 5 секунд, используем локальные данные")
+                    loadFromLocalDatabase()
+                }
+            } catch (e: Exception) {
+                Log.e("MainViewModel", "Ошибка синхронизации: ${e.message}")
+                loadFromLocalDatabase()
             }
-
-            _loadingProgress.postValue(1.0f) // Загрузка завершена
         }
+    }
+
+    private fun loadFromLocalDatabase() {
+        Log.d("MainViewModel", "Загрузка данных из локальной базы")
     }
 }

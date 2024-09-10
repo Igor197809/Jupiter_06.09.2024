@@ -1,6 +1,6 @@
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.jetbrains.kotlin.android)
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
 }
 
 android {
@@ -55,36 +55,39 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
+    implementation("androidx.core:core-ktx:1.7.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.0")
+    implementation("androidx.activity:activity-compose:1.4.0")
+    implementation("androidx.compose.ui:ui:1.1.0")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.1.0")
+    implementation("androidx.compose.material3:material3:1.0.0-alpha13")
     implementation("androidx.navigation:navigation-compose:2.5.3")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
 
-    // Добавьте эту зависимость для LiveData в Compose
-    implementation("androidx.compose.runtime:runtime-livedata:1.5.1")
+    // WorkManager dependency for background tasks
+    implementation("androidx.work:work-runtime-ktx:2.7.1")
 
     // Google Sheets API and OAuth dependencies
     implementation("com.google.api-client:google-api-client-android:1.33.2")
     implementation("com.google.oauth-client:google-oauth-client-jetty:1.33.2")
     implementation("com.google.apis:google-api-services-sheets:v4-rev581-1.25.0")
 
-    // Важная зависимость для работы с HTTP на Android
-    implementation("com.google.http-client:google-http-client-android:1.39.2")
+    // Google HTTP Client для Android и Jackson
+    implementation("com.google.http-client:google-http-client-android:1.41.5")
+    implementation("com.google.api-client:google-api-client-jackson2:2.7.0")
 
+
+    // Google OAuth2 HTTP
     implementation("com.google.auth:google-auth-library-oauth2-http:0.25.2")
 
+    // Koin для DI (если нужен)
+    implementation("io.insert-koin:koin-android:3.1.2")
+
     // Testing dependencies
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.3")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.1.0")
+    debugImplementation("androidx.compose.ui:ui-tooling:1.1.0")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.1.0")
 }
