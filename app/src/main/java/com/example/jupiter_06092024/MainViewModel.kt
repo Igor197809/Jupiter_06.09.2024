@@ -1,21 +1,20 @@
 package com.example.jupiter_06092024
 
-import android.content.Context
+import android.app.Application
 import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
-
 import com.google.api.services.sheets.v4.Sheets
 import kotlinx.coroutines.*
 import java.io.InputStream
-import com.google.auth.http.HttpCredentialsAdapter
+import com.google.api.client.http.HttpRequestInitializer
 
-class MainViewModel(private val context: Context) : ViewModel() {
+class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _loadingProgress = MutableLiveData<Float>()
     val loadingProgress: LiveData<Float> = _loadingProgress
@@ -35,14 +34,14 @@ class MainViewModel(private val context: Context) : ViewModel() {
         withContext(Dispatchers.IO) {
             try {
                 val tabs = listOf("Sheet1!A1:D10", "Sheet2!A1:D10")
-                val credentialsStream: InputStream = context.assets.open("jupiter_credentials.json")
+                val credentialsStream: InputStream = getApplication<Application>().assets.open("jupiter_credentials.json")
                 val credential = GoogleCredentials.fromStream(credentialsStream)
                     .createScoped(listOf("https://www.googleapis.com/auth/spreadsheets"))
 
                 val sheetsService = Sheets.Builder(
                     GoogleNetHttpTransport.newTrustedTransport(),
                     JacksonFactory.getDefaultInstance(),
-                    HttpCredentialsAdapter(credential)  // Преобразование в HttpRequestInitializer
+                    credential as HttpRequestInitializer  // Исправляем тип на HttpRequestInitializer
                 ).setApplicationName("Jupiter App")
                     .build()
 

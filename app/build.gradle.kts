@@ -76,6 +76,9 @@ dependencies {
     implementation("com.google.http-client:google-http-client-android:1.41.5")
     implementation("com.google.api-client:google-api-client-jackson2:1.30.10")
 
+    // Для использования LiveData в Jetpack Compose
+    implementation("androidx.compose.runtime:runtime-livedata:1.5.1")
+
 
 
     // Google OAuth2 HTTP
