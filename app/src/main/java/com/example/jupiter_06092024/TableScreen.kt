@@ -1,12 +1,12 @@
 package com.example.jupiter_06092024.ui
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.* // Для работы с Layout
+import androidx.compose.foundation.lazy.LazyColumn // Для ленивой загрузки данных
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Text // Необходимо добавить этот импорт
+import androidx.compose.material.Text // Импортируем Text из material
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.dp // Для отступов
 
 @Composable
 fun TableScreen(data: List<List<Any>>) {
@@ -22,7 +22,7 @@ fun TableScreen(data: List<List<Any>>) {
                     .padding(8.dp)
             ) {
                 row.forEach { cell ->
-                    Text(  // Убедитесь, что компонент Text используется правильно
+                    Text(
                         text = cell.toString(),
                         modifier = Modifier
                             .weight(1f)
