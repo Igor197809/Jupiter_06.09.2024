@@ -34,13 +34,9 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     composable("table") {
-                        val data = viewModel.sheetData.observeAsState(emptyMap())
-                        val sheetData = data.value["Sheet1"] // Получаем данные по ключу вкладки
-
-                        // Преобразуем данные в ожидаемый формат, если это нужно для отображения
-                        TableScreen(data = sheetData ?: emptyList())
+                        val data = viewModel.sheetData.observeAsState(emptyList())
+                        TableScreen(data = data.value)  // Передаем загруженные данные
                     }
-
                 }
             }
         }

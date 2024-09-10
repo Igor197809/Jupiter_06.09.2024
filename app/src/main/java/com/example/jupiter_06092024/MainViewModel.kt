@@ -5,17 +5,18 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 
-class MainViewModel(application: android.app.Application) : AndroidViewModel(application) {
+class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _loadingProgress = MutableLiveData(0f)
     val loadingProgress: LiveData<Float> = _loadingProgress
 
-    private val _sheetData = MutableLiveData<Map<String, List<List<Any>>>>() // Изменено на List<List<Any>>
-    val sheetData: LiveData<Map<String, List<List<Any>>>> = _sheetData
+    private val _sheetData = MutableLiveData<List<List<Any>>>()
+    val sheetData: LiveData<List<List<Any>>> = _sheetData
 
     init {
         loadData()
@@ -24,33 +25,43 @@ class MainViewModel(application: android.app.Application) : AndroidViewModel(app
     private fun loadData() {
         viewModelScope.launch(Dispatchers.IO) {
             val data = withTimeoutOrNull(5000) { // Таймаут на 5 секунд
-                // Симуляция загрузки данных
-                fetchDataFromGoogleSheets()
+                accessGoogleSheet()
             }
 
             if (data != null) {
                 _sheetData.postValue(data)
                 _loadingProgress.postValue(1f) // Загрузка завершена
             } else {
-                // Загрузка кэшированных данных
-                val cachedData = loadCachedData()
-                _sheetData.postValue(cachedData)
+                // Обработка ошибки или использование кэшированных данных
+                _sheetData.postValue(emptyList()) // Кэширование пока не реализовано
             }
         }
     }
 
-    private suspend fun fetchDataFromGoogleSheets(): Map<String, List<List<Any>>> {
-        // Здесь должна быть реализация загрузки данных с Google Sheets
-        return mapOf("Sheet1" to listOf(
-            listOf("Данные 1", "Данные 2", "Данные 3") as List<Any>,  // Пример данных
-            listOf("Данные 4", "Данные 5", "Данные 6") as List<Any>
-        ))
+    // Пример функции для доступа к Google Sheets
+    private suspend fun accessGoogleSheet(): List<List<Any>> {
+        val httpTransport = com.google.api.client.http.javanet.NetHttpTransport()
+        val jsonFactory = com.google.api.client.json.jackson2.JacksonFactory.getDefaultInstance()
+        val credentials = getCredentials(getApplication(), "jupiter_credentials.json")
+
+        val service = com.google.api.services.sheets.v4.Sheets.Builder(httpTransport, jsonFactory, credentials)
+            .setApplicationName("Jupiter App")
+            .build()
+
+        val spreadsheetId = "1J5wxqk1_nCPEUBnilSHI8RgnWU7CUV-vxrAVGl6LX5M"
+        val range = "Sheet1!A1:N20" // Пример диапазона, который нужно загрузить
+
+        val response = service.spreadsheets().values()
+            .get(spreadsheetId, range)
+            .execute()
+
+        return response.getValues() ?: emptyList()
     }
 
-    private fun loadCachedData(): Map<String, List<List<Any>>> {
-        // Логика загрузки кэшированных данных
-        return mapOf("Sheet1" to listOf(
-            listOf("Кэшированные данные 1", "Кэшированные данные 2") as List<Any>
-        ))
+    // Функция для получения OAuth 2.0 учетных данных
+    private fun getCredentials(context: android.content.Context, credentialsFilePath: String): GoogleCredential {
+        val stream = context.assets.open(credentialsFilePath)  // Убедитесь, что файл jupiter_credentials.json находится в assets
+        return GoogleCredential.fromStream(stream)
+            .createScoped(listOf("https://www.googleapis.com/auth/spreadsheets.readonly"))
     }
 }

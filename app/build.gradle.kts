@@ -64,10 +64,10 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.5.3")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
 
-    // WorkManager dependency for background tasks
+    // WorkManager для фоновых задач
     implementation("androidx.work:work-runtime-ktx:2.7.1")
 
-    // Google Sheets API and OAuth dependencies
+    // Зависимости для работы с Google Sheets API и OAuth2
     implementation("com.google.api-client:google-api-client-android:1.33.2")
     implementation("com.google.oauth-client:google-oauth-client-jetty:1.33.2")
     implementation("com.google.apis:google-api-services-sheets:v4-rev581-1.25.0")
@@ -77,17 +77,12 @@ dependencies {
     implementation("com.google.api-client:google-api-client-jackson2:1.30.10")
 
     // Для использования LiveData в Jetpack Compose
-    implementation("androidx.compose.runtime:runtime-livedata:1.5.1")
-
-
+    implementation("androidx.compose.runtime:runtime-livedata:1.1.0")
 
     // Google OAuth2 HTTP
     implementation("com.google.auth:google-auth-library-oauth2-http:0.25.2")
 
-    // Koin для DI (если нужен)
-    implementation("io.insert-koin:koin-android:3.1.2")
-
-    // Testing dependencies
+    // Testing
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
