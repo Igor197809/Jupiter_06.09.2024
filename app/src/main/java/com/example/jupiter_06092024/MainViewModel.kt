@@ -1,27 +1,26 @@
 package com.example.jupiter_06092024
 
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.google.api.client.http.javanet.NetHttpTransport
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
+import com.google.api.services.sheets.v4.Sheets
 import com.google.auth.http.HttpCredentialsAdapter
 import com.google.auth.oauth2.GoogleCredentials
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
-import java.io.InputStream
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _loadingProgress = MutableLiveData(0f)
     val loadingProgress: LiveData<Float> = _loadingProgress
 
-    private val _sheetData = MutableLiveData<List<List<Any>>>()
-    val sheetData: LiveData<List<List<Any>>> = _sheetData
+    private val _sheetNames = MutableLiveData<List<String>>()
+    val sheetNames: LiveData<List<String>> = _sheetNames
 
     init {
         loadData()
@@ -29,46 +28,47 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun loadData() {
         viewModelScope.launch(Dispatchers.IO) {
-            val data = withTimeoutOrNull(5000) { // Таймаут на 5 секунд
-                accessGoogleSheet()
+            val names = withTimeoutOrNull(5000) {
+                getSheetNames()
             }
 
-            if (data != null) {
-                _sheetData.postValue(data)
+            if (names != null) {
+                _sheetNames.postValue(names)
                 _loadingProgress.postValue(1f) // Загрузка завершена
             } else {
-                _sheetData.postValue(emptyList()) // Обработка ошибки или использование кэшированных данных
+                // Обработка ошибки или использование кэшированных данных
+                _sheetNames.postValue(emptyList()) // Кэширование пока не реализовано
             }
         }
     }
 
-    // Пример функции для доступа к Google Sheets
-    private suspend fun accessGoogleSheet(): List<List<Any>> {
-        val httpTransport = NetHttpTransport() // Используем стандартный HTTP транспорт
+    // Функция для получения имен листов в Google Sheets API
+    private suspend fun getSheetNames(): List<String> {
+        val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
         val jsonFactory = JacksonFactory.getDefaultInstance()
+
+        // Получаем OAuth 2.0 учетные данные
         val credentials = getCredentials(getApplication(), "jupiter_credentials.json")
 
-        // Используем HttpCredentialsAdapter для преобразования GoogleCredentials в HttpRequestInitializer
+        // Преобразуем GoogleCredentials в HttpRequestInitializer через HttpCredentialsAdapter
         val requestInitializer = HttpCredentialsAdapter(credentials)
 
-        val service = com.google.api.services.sheets.v4.Sheets.Builder(httpTransport, jsonFactory, requestInitializer)
+        val service = Sheets.Builder(httpTransport, jsonFactory, requestInitializer)
             .setApplicationName("Jupiter App")
             .build()
 
         val spreadsheetId = "1J5wxqk1_nCPEUBnilSHI8RgnWU7CUV-vxrAVGl6LX5M"
-        val range = "'ПК 882+37-1100+00'!A1:N21"  // Ensure this matches your sheet's name and cell range
 
+        // Запрашиваем информацию о всех листах
+        val spreadsheet = service.spreadsheets().get(spreadsheetId).execute()
 
-        val response = service.spreadsheets().values()
-            .get(spreadsheetId, range)
-            .execute()
-
-        return response.getValues() ?: emptyList()
+        // Получаем имена листов
+        return spreadsheet.sheets.map { it.properties.title }
     }
 
-    // Функция для получения OAuth 2.0 учетных данных
-    private fun getCredentials(context: Context, credentialsFilePath: String): GoogleCredentials {
-        val stream: InputStream = context.assets.open(credentialsFilePath)
+    // Функция для получения OAuth 2.0 учетных данных с использованием GoogleCredentials
+    private fun getCredentials(context: android.content.Context, credentialsFilePath: String): GoogleCredentials {
+        val stream = context.assets.open(credentialsFilePath)  // Убедитесь, что файл jupiter_credentials.json находится в assets
         return GoogleCredentials.fromStream(stream)
             .createScoped(listOf("https://www.googleapis.com/auth/spreadsheets.readonly"))
     }
