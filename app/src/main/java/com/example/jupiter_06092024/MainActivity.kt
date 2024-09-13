@@ -12,11 +12,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)  // Убедитесь, что у вас есть соответствующий макет activity_main.xml
+        setContentView(R.layout.activity_main)
+
+        // Загружаем данные с Google Sheets API
+        viewModel.loadSheetData()
 
         // Наблюдаем за данными листов (sheetData) и обновляем UI при изменениях
-        viewModel.sheetData.observe(this, Observer { sheetData ->
-            // Обновляем интерфейс с данными
+        viewModel.sheetData.observe(this, Observer<List<String>> { sheetData ->
             if (sheetData != null && sheetData.isNotEmpty()) {
                 println("Данные листа: ${sheetData.joinToString()}")
             } else {
