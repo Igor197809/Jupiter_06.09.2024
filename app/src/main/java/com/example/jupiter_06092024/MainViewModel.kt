@@ -1,13 +1,11 @@
-package com.example.jupiter_06092024
-
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import com.google.api.client.json.gson.GsonFactory // Импорт GsonFactory
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
-import com.google.api.client.json.jackson2.JacksonFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 
 class MainViewModel : ViewModel() {
 
@@ -17,8 +15,8 @@ class MainViewModel : ViewModel() {
     // Публичная переменная LiveData для наблюдения
     val sheetData: LiveData<List<String>> get() = _sheetData
 
-    // Инициализация Jackson и Google API
-    private val jsonFactory = JacksonFactory.getDefaultInstance()
+    // Инициализация Gson и Google API
+    private val jsonFactory = GsonFactory.getDefaultInstance()  // Используем GsonFactory
     private val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
 
     // Загрузка данных с Google Sheets API
@@ -31,7 +29,7 @@ class MainViewModel : ViewModel() {
 
     // Пример функции для получения данных с Google Sheets
     private fun fetchDataFromGoogleSheets(): List<String> {
-        // Здесь должна быть логика загрузки данных
+        // Здесь должна быть логика загрузки данных с Google Sheets
         return listOf("Data 1", "Data 2", "Data 3")
     }
 }

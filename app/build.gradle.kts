@@ -72,14 +72,13 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 
     // Google Sheets API and OAuth2 dependencies
-    implementation("com.google.api-client:google-api-client-android:1.35.0")
+    implementation("com.google.api-client:google-api-client-gson:1.35.0") // Updated version
     implementation("com.google.oauth-client:google-oauth-client-jetty:1.34.1")
     implementation("com.google.apis:google-api-services-sheets:v4-rev612-1.25.0")
 
     // Jackson dependencies for Google API
-    implementation("com.google.api-client:google-api-client-jackson2:2.7.0")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.0")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.0")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.17.2") // Updated version
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.2") // Updated version
 
     // LiveData in Jetpack Compose
     implementation("androidx.compose.runtime:runtime-livedata:1.5.0")
@@ -95,3 +94,4 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling:1.5.0")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.0")
 }
+
